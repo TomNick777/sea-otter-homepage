@@ -281,12 +281,27 @@
         .shortcut-icon {
             width: 48px;
             height: 48px;
+            border-radius: 12px;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
             transition: transform 0.3s ease;
             pointer-events: none;
+            background: rgba(255,255,255,0.06);
+        }
+
+        .shortcut-icon img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .shortcut-icon .fallback {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-secondary);
         }
 
         .shortcut-card:hover .shortcut-icon { transform: scale(1.1); }
@@ -496,7 +511,8 @@
             .status-badge, .settings-btn { font-size: 0.7rem; padding: 6px 10px; }
             .shortcuts-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
             .shortcut-card, .add-card { padding: 16px; border-radius: 16px; }
-            .shortcut-icon, .add-icon { width: 40px; height: 40px; font-size: 1.5rem; }
+            .shortcut-icon, .add-icon { width: 40px; height: 40px; }
+            .shortcut-icon img { width: 30px; height: 30px; }
             .shortcut-name, .add-text { font-size: 0.75rem; }
             .modal { margin: 20px; padding: 24px; }
         }
@@ -586,27 +602,31 @@
 
     <script>
         const defaultShortcuts = [
-            { name: 'GitHub', url: 'https://github.com', icon: 'github', color: '#fff' },
-            { name: '哔哩哔哩', url: 'https://bilibili.com', icon: 'bilibili', color: '#fb7299' },
-            { name: '知乎', url: 'https://zhihu.com', icon: 'zhihu', color: '#0084ff' },
-            { name: 'YouTube', url: 'https://youtube.com', icon: 'youtube', color: '#ff0000' },
-            { name: 'Twitter', url: 'https://twitter.com', icon: 'twitter', color: '#1da1f2' },
-            { name: 'Notion', url: 'https://notion.so', icon: 'notion', color: '#fff' },
-            { name: 'Figma', url: 'https://figma.com', icon: 'figma', color: '#f24e1e' },
-            { name: 'Vercel', url: 'https://vercel.com', icon: 'vercel', color: '#fff' }
+            { name: 'GitHub', url: 'https://github.com' },
+            { name: '哔哩哔哩', url: 'https://bilibili.com' },
+            { name: '知乎', url: 'https://zhihu.com' },
+            { name: 'YouTube', url: 'https://youtube.com' },
+            { name: 'Twitter', url: 'https://twitter.com' },
+            { name: 'Notion', url: 'https://notion.so' },
+            { name: 'Figma', url: 'https://figma.com' },
+            { name: 'Vercel', url: 'https://vercel.com' }
         ];
 
-        const icons = {
-            github: '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>',
-            bilibili: '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M17.813 4.653h.854c1.51.054 2.769.578 3.773 1.574 1.004.995 1.524 2.249 1.56 3.76v7.36c-.036 1.51-.556 2.769-1.56 3.773s-2.262 1.524-3.773 1.56H5.333c-1.51-.036-2.769-.556-3.773-1.56S.036 18.858 0 17.347v-7.36c.036-1.511.556-2.765 1.56-3.76 1.004-.996 2.262-1.52 3.773-1.574h.774l-1.174-1.12a1.234 1.234 0 0 1-.373-.906c0-.356.124-.658.373-.907l.027-.027c.267-.249.573-.373.92-.373.347 0 .653.124.92.373L9.653 4.44c.071.071.134.142.187.213h4.267a.836.836 0 0 1 .16-.213l2.853-2.747c.267-.249.573-.373.92-.373.347 0 .662.151.929.4.267.249.391.551.391.907 0 .355-.124.657-.373.906zM5.333 7.24c-.746.018-1.373.276-1.88.773-.506.498-.769 1.13-.786 1.894v7.52c.017.764.28 1.395.786 1.893.507.498 1.134.756 1.88.773h13.334c.746-.017 1.373-.275 1.88-.773.506-.498.769-1.129.786-1.893v-7.52c-.017-.765-.28-1.396-.786-1.894-.507-.497-1.134-.755-1.88-.773zM8 11.107c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c0-.373.129-.689.386-.947.258-.257.574-.386.947-.386zm8 0c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c.017-.391.15-.711.4-.96.249-.249.56-.373.933-.373z"/></svg>',
-            zhihu: '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M5.721 0C2.251 0 0 2.25 0 5.719V18.28C0 21.751 2.252 24 5.721 24h12.56C21.751 24 24 21.75 24 18.281V5.72C24 2.249 21.75 0 18.281 0zm1.964 4.078c-.271.73-.5 1.434-.68 2.11h4.587c.545-.006.445 1.168.445 1.171H9.384a58.104 58.104 0 0 1-.112 3.797h2.726c.388.023.393 1.251.393 1.251H9.183c.062 1.191.328 2.559.837 4.107.317.938.668 1.729 1.055 2.373.387.643.737.999 1.051 1.066.313.067.469-.169.469-.707 0-.538-.029-1.082-.086-1.631.057-.044.126-.065.209-.065.266 0 .622.168 1.068.503.446.335.837.755 1.172 1.26.335.505.503 1.024.503 1.557 0 .534-.168.968-.503 1.303-.335.335-.754.503-1.256.503-.503 0-1.025-.168-1.567-.503a5.16 5.16 0 0 1-1.406-1.26c-.39-.538-.683-1.111-.879-1.718-.196-.607-.337-1.244-.422-1.91a17.264 17.264 0 0 1-.128-1.98c-.006-.335-.009-.67-.009-1.005h-2.33c-.006-.335-.009-.67-.009-1.005h2.348c.062-1.266.112-2.532.149-3.797H6.005c-.006-.335-.009-.67-.009-1.005h4.165c.18-.676.409-1.38.68-2.11z"/></svg>',
-            youtube: '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>',
-            twitter: '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M23.953 4.57a10 10 0 0 1-2.825.775 4.958 4.958 0 0 0 2.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 0 0-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 0 0-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 0 1-2.228-.616v.06a4.923 4.923 0 0 0 3.946 4.827 4.996 4.996 0 0 1-2.212.085 4.936 4.936 0 0 0 4.604 3.417 9.867 9.867 0 0 1-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 0 0 7.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0 0 24 4.59z"/></svg>',
-            notion: '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.98-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952l1.449.327s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.14c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.933.653.933 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.448-1.632z"/></svg>',
-            figma: '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M15.852 8.981h-4.588V0h4.588c2.476 0 4.49 2.014 4.49 4.49s-2.014 4.491-4.49 4.491zM12.735 7.51h3.117c1.665 0 3.019-1.355 3.019-3.019s-1.355-3.019-3.019-3.019h-3.117V7.51zM8.148 24c-2.476 0-4.49-2.014-4.49-4.49s2.014-4.49 4.49-4.49h4.588v4.441c0 2.503-2.047 4.539-4.588 4.539zm-.001-7.509c-1.665 0-3.019 1.355-3.019 3.019s1.355 3.019 3.019 3.019c1.692 0 3.06-1.377 3.06-3.061v-2.977H8.147zM8.148 8.981c-2.476 0-4.49-2.014-4.49-4.49S5.672 0 8.148 0h4.588v8.981H8.148zm-.001-7.51c-1.665 0-3.019 1.355-3.019 3.019s1.355 3.019 3.019 3.019h3.117V1.471H8.147zM8.148 15.02c-2.476 0-4.49-2.014-4.49-4.49s2.014-4.49 4.49-4.49h4.588v8.981H8.148zm-.001-7.51c-1.665 0-3.019 1.355-3.019 3.019s1.355 3.019 3.019 3.019h3.117V7.51H8.147zM15.852 15.02h-4.588V6.039h4.588c2.476 0 4.49 2.014 4.49 4.49s-2.014 4.491-4.49 4.491zm-3.117-1.471h3.117c1.665 0 3.019-1.355 3.019-3.019s-1.355-3.019-3.019-3.019h-3.117v6.038z"/></svg>',
-            vercel: '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M24 22.525H0l12-21.05 12 21.05z"/></svg>',
-            link: '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>'
-        };
+        // 从 URL 获取 Favicon
+        function getFaviconUrl(url) {
+            try {
+                const domain = new URL(url).hostname;
+                // DuckDuckGo Favicon API - 稳定、国内可用
+                return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
+            } catch {
+                return null;
+            }
+        }
+
+        // 获取首字母作为备用
+        function getFallback(name) {
+            return (name || '?')[0].toUpperCase();
+        }
 
         // 变量
         let shortcuts = [];
@@ -756,11 +776,12 @@
                 card.draggable = true;
                 card.dataset.index = index;
                 
-                const iconSvg = icons[shortcut.icon] || icons.link;
+                const faviconUrl = getFaviconUrl(shortcut.url);
+                const fallback = getFallback(shortcut.name);
                 
                 card.innerHTML = `
-                    <div class="shortcut-icon" style="color: ${shortcut.color || '#fff'}">
-                        ${iconSvg}
+                    <div class="shortcut-icon">
+                        ${faviconUrl ? `<img src="${faviconUrl}" alt="${shortcut.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="fallback" style="display:none">${fallback}</span>` : `<span class="fallback">${fallback}</span>`}
                     </div>
                     <span class="shortcut-name">${shortcut.name}</span>
                 `;
@@ -919,21 +940,10 @@
             if (!name || !url) return;
             if (!url.startsWith('http')) url = 'https://' + url;
 
-            let icon = 'link', color = '#fff';
-            const domain = url.toLowerCase();
-            if (domain.includes('github')) { icon = 'github'; color = '#fff'; }
-            else if (domain.includes('bilibili')) { icon = 'bilibili'; color = '#fb7299'; }
-            else if (domain.includes('zhihu')) { icon = 'zhihu'; color = '#0084ff'; }
-            else if (domain.includes('youtube')) { icon = 'youtube'; color = '#ff0000'; }
-            else if (domain.includes('twitter') || domain.includes('x.com')) { icon = 'twitter'; color = '#1da1f2'; }
-            else if (domain.includes('notion')) { icon = 'notion'; color = '#fff'; }
-            else if (domain.includes('figma')) { icon = 'figma'; color = '#f24e1e'; }
-            else if (domain.includes('vercel')) { icon = 'vercel'; color = '#fff'; }
-
             if (editingIndex !== null) {
-                shortcuts[editingIndex] = { name, url, icon, color };
+                shortcuts[editingIndex] = { name, url };
             } else {
-                shortcuts.push({ name, url, icon, color });
+                shortcuts.push({ name, url });
             }
             
             saveShortcuts();
