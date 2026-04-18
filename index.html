@@ -648,30 +648,43 @@
         // GitHub API
         const GIST_FILENAME = 'sea-otter-shortcuts.json';
 
-        async function gistRequest(method, path, body = null) {
-            const response = await fetch(`https://api.github.com${path}`, {
-                method,
-                headers: {
-                    'Authorization': `Bearer ${githubToken}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json'
-                },
-                body: body ? JSON.stringify(body) : null
-            });
-            
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'GitHub API error');
+        // 带超时和重试的请求
+        async function gistRequest(method, path, body = null, retries = 2) {
+            for (let i = 0; i <= retries; i++) {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 10000);
+                try {
+                    const response = await fetch(`https://api.github.com${path}`, {
+                        method,
+                        headers: {
+                            'Authorization': `Bearer ${githubToken}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: body ? JSON.stringify(body) : null,
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeout);
+                    if (!response.ok) {
+                        const error = await response.json().catch(() => ({}));
+                        throw new Error(error.message || `HTTP ${response.status}`);
+                    }
+                    return response.json();
+                } catch (err) {
+                    clearTimeout(timeout);
+                    if (i === retries) {
+                        const hint = err.name === 'AbortError' ? '请求超时(10s)，请检查网络' : err.message;
+                        throw new Error(hint);
+                    }
+                    // 等待后重试
+                    await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+                }
             }
-            
-            return response.json();
         }
 
         async function loadFromGist() {
             if (!githubToken) return null;
-            
             try {
-                // 尝试获取现有 Gist
                 if (gistId) {
                     const gist = await gistRequest('GET', `/gists/${gistId}`);
                     const file = gist.files[GIST_FILENAME];
@@ -679,7 +692,6 @@
                         return JSON.parse(file.content);
                     }
                 } else {
-                    // 查找用户的 sea-otter gists
                     const gists = await gistRequest('GET', '/gists?per_page=100');
                     const existing = gists.find(g => 
                         g.description === 'sea-otter-homepage-data' && 
@@ -691,48 +703,38 @@
                         return JSON.parse(existing.files[GIST_FILENAME].content);
                     }
                 }
+                return null;
             } catch (error) {
                 console.error('加载 Gist 失败:', error);
-                updateStatus('error', '同步失败');
+                updateStatus('error', error.message || '同步失败');
+                return null;
             }
-            
-            return null;
         }
 
         async function saveToGist(data) {
             if (!githubToken || isSyncing) return false;
-            
             isSyncing = true;
             updateStatus('syncing', '同步中...');
-            
             try {
                 const content = JSON.stringify(data, null, 2);
-                
                 if (gistId) {
-                    // 更新现有 Gist
                     await gistRequest('PATCH', `/gists/${gistId}`, {
-                        files: {
-                            [GIST_FILENAME]: { content }
-                        }
+                        files: { [GIST_FILENAME]: { content } }
                     });
                 } else {
-                    // 创建新 Gist
                     const gist = await gistRequest('POST', '/gists', {
                         description: 'sea-otter-homepage-data',
                         public: false,
-                        files: {
-                            [GIST_FILENAME]: { content }
-                        }
+                        files: { [GIST_FILENAME]: { content } }
                     });
                     gistId = gist.id;
                     localStorage.setItem('otter_gist_id', gistId);
                 }
-                
                 updateStatus('connected', '已同步');
                 return true;
             } catch (error) {
                 console.error('保存 Gist 失败:', error);
-                updateStatus('error', '同步失败');
+                updateStatus('error', error.message || '同步失败');
                 return false;
             } finally {
                 isSyncing = false;
@@ -745,16 +747,19 @@
         }
 
         async function syncShortcuts() {
-            // 优先加载云端数据
+            updateStatus(githubToken ? 'syncing' : '', githubToken ? '加载中...' : '本地模式');
             const cloudData = await loadFromGist();
             
             if (cloudData && Array.isArray(cloudData)) {
                 shortcuts = cloudData;
                 localStorage.setItem('otterShortcuts', JSON.stringify(shortcuts));
+                updateStatus('connected', '已同步');
             } else {
                 // 加载本地数据
                 const localData = localStorage.getItem('otterShortcuts');
                 shortcuts = localData ? JSON.parse(localData) : defaultShortcuts;
+                if (githubToken) updateStatus('connected', '已连接');
+            }
             }
             
             renderShortcuts();
@@ -987,12 +992,22 @@
             if (token) {
                 updateStatus('syncing', '测试连接...');
                 try {
-                    await gistRequest('GET', '/gists?per_page=1');
-                    updateStatus('connected', '已同步');
-                    // 立即同步
-                    await syncShortcuts();
+                    const test = await gistRequest('GET', '/user');
+                    console.log('✅ 连接成功，用户:', test.login);
+                    updateStatus('syncing', '同步中...');
+                    const cloudData = await loadFromGist();
+                    if (cloudData && Array.isArray(cloudData)) {
+                        shortcuts = cloudData;
+                        localStorage.setItem('otterShortcuts', JSON.stringify(shortcuts));
+                        renderShortcuts();
+                        updateStatus('connected', '已同步');
+                    } else {
+                        renderShortcuts();
+                        updateStatus('connected', '已连接');
+                    }
                 } catch (error) {
-                    updateStatus('error', '连接失败');
+                    console.error('连接失败:', error);
+                    updateStatus('error', error.message);
                 }
             } else {
                 githubToken = null;
@@ -1013,6 +1028,23 @@
             document.getElementById('githubToken').value = '';
             document.getElementById('gistId').value = '';
             updateStatus('', '本地模式');
+        });
+
+        // 点击状态徽章手动重新同步
+        statusBadge.style.cursor = 'pointer';
+        statusBadge.title = '点击重新同步';
+        statusBadge.addEventListener('click', async () => {
+            if (!githubToken || isSyncing) return;
+            updateStatus('syncing', '同步中...');
+            const cloudData = await loadFromGist();
+            if (cloudData && Array.isArray(cloudData)) {
+                shortcuts = cloudData;
+                localStorage.setItem('otterShortcuts', JSON.stringify(shortcuts));
+                renderShortcuts();
+                updateStatus('connected', '已同步');
+            } else {
+                updateStatus('connected', '已连接');
+            }
         });
 
         // 时钟
