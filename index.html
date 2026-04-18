@@ -260,11 +260,29 @@
             position: relative;
             user-select: none;
             overflow: hidden;
+            box-shadow:
+                0 2px 4px rgba(0,0,0,0.08),
+                0 4px 12px rgba(0,0,0,0.12),
+                inset 0 1px 0 rgba(255,255,255,0.25),
+                inset 0 -1px 0 rgba(0,0,0,0.08);
+        }
+
+        .shortcut-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 50%, rgba(0,0,0,0.06) 100%);
+            pointer-events: none;
+            border-radius: inherit;
         }
 
         .shortcut-card:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.1);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow:
+                0 6px 16px rgba(0,0,0,0.15),
+                0 12px 32px rgba(0,0,0,0.12),
+                inset 0 1px 0 rgba(255,255,255,0.3),
+                inset 0 -1px 0 rgba(0,0,0,0.1);
         }
 
         .shortcut-card:active { cursor: grabbing; }
@@ -273,12 +291,12 @@
 
         .shortcut-name {
             font-size: 0.85rem;
-            font-weight: 500;
-            color: rgba(0, 0, 0, 0.7);
+            font-weight: 700;
+            color: rgba(0, 0, 0, 0.75);
             padding: 10px 20px;
             white-space: nowrap;
             pointer-events: none;
-            text-shadow: 0 1px 2px rgba(255,255,255,0.3);
+            text-shadow: 0 1px 3px rgba(255,255,255,0.35);
         }
 
         .add-card {
@@ -286,21 +304,28 @@
             align-items: center;
             gap: 8px;
             padding: 10px 20px;
-            background: transparent;
+            background: rgba(255,255,255,0.04);
             border: 2px dashed var(--border);
             border-radius: 999px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow:
+                0 1px 3px rgba(0,0,0,0.05),
+                inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
         .add-card:hover {
             border-color: var(--border-hover);
-            background: rgba(245, 245, 247, 0.02);
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-2px);
+            box-shadow:
+                0 4px 12px rgba(0,0,0,0.1),
+                inset 0 1px 0 rgba(255,255,255,0.15);
         }
 
         .add-icon { font-size: 1.1rem; color: var(--text-muted); }
         .add-card:hover .add-icon { color: var(--text-secondary); }
-        .add-text { font-size: 0.85rem; font-weight: 500; color: var(--text-muted); }
+        .add-text { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); }
 
         /* 右键菜单 */
         .context-menu {
