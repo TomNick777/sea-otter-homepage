@@ -241,93 +241,68 @@
         .shortcuts-section { width: 100%; }
 
         .shortcuts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 16px;
-            max-width: 900px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            max-width: 800px;
             margin: 0 auto;
+            justify-content: center;
         }
 
         .shortcut-card {
-            aspect-ratio: 1;
-            display: flex;
-            flex-direction: column;
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 16px;
-            padding: 24px;
+            padding: 0;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 20px;
+            border-radius: 999px;
             cursor: grab;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             backdrop-filter: blur(20px);
             text-decoration: none;
             position: relative;
             user-select: none;
+            overflow: hidden;
         }
 
         .shortcut-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-2px);
             border-color: var(--border-hover);
-            background: var(--bg-elevated);
             box-shadow: var(--shadow-hover);
         }
 
         .shortcut-card:active { cursor: grabbing; }
-        .shortcut-card.dragging { opacity: 0.5; transform: scale(0.95); border-color: var(--accent); }
-        .shortcut-card.drag-over { border-color: var(--accent); background: rgba(232, 228, 225, 0.1); }
+        .shortcut-card.dragging { opacity: 0.5; transform: scale(0.95); }
+        .shortcut-card.drag-over { border-color: var(--accent); }
 
-        .shortcut-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.3s ease;
-            pointer-events: none;
-            background: rgba(255,255,255,0.06);
+        .shortcut-color-bar {
+            width: 6px;
+            height: 100%;
+            min-height: 36px;
+            flex-shrink: 0;
+            border-radius: 999px 0 0 999px;
         }
-
-        .shortcut-icon img {
-            width: 36px;
-            height: 36px;
-            object-fit: contain;
-            border-radius: 8px;
-        }
-
-        .shortcut-icon .fallback {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .shortcut-card:hover .shortcut-icon { transform: scale(1.1); }
 
         .shortcut-name {
             font-size: 0.85rem;
             font-weight: 500;
             color: var(--text-secondary);
-            text-align: center;
-            transition: color 0.3s ease;
+            padding: 10px 18px;
+            white-space: nowrap;
             pointer-events: none;
+            transition: color 0.3s ease;
         }
 
         .shortcut-card:hover .shortcut-name { color: var(--text-primary); }
 
         .add-card {
-            aspect-ratio: 1;
-            display: flex;
-            flex-direction: column;
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 16px;
-            padding: 24px;
+            gap: 8px;
+            padding: 10px 20px;
             background: transparent;
             border: 2px dashed var(--border);
-            border-radius: 20px;
+            border-radius: 999px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
@@ -337,22 +312,8 @@
             background: rgba(245, 245, 247, 0.02);
         }
 
-        .add-icon {
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: var(--text-muted);
-            transition: all 0.3s ease;
-        }
-
-        .add-card:hover .add-icon {
-            color: var(--text-secondary);
-            transform: scale(1.1);
-        }
-
+        .add-icon { font-size: 1.1rem; color: var(--text-muted); }
+        .add-card:hover .add-icon { color: var(--text-secondary); }
         .add-text { font-size: 0.85rem; font-weight: 500; color: var(--text-muted); }
 
         /* 右键菜单 */
@@ -445,6 +406,51 @@
 
         .modal-input:focus { border-color: var(--accent); }
         .modal-input::placeholder { color: var(--text-muted); }
+
+        .color-picker-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .color-picker-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .color-picker-input {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            padding: 0;
+            background: none;
+        }
+
+        .color-picker-input::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-picker-input::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 50%; }
+
+        .color-presets {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .color-preset {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .color-preset:hover { transform: scale(1.2); }
+        .color-preset.selected { border-color: white; box-shadow: 0 0 0 2px var(--bg); }
 
         .modal-hint {
             font-size: 0.8rem;
@@ -572,6 +578,22 @@
             <div class="modal-title" id="shortcutModalTitle">添加快捷方式</div>
             <input type="text" class="modal-input" id="siteName" placeholder="网站名称">
             <input type="text" class="modal-input" id="siteUrl" placeholder="网址 (例如: https://example.com)">
+            <div class="color-picker-row">
+                <span class="color-picker-label">颜色</span>
+                <input type="color" id="siteColor" class="color-picker-input" value="#6366f1">
+                <div class="color-presets" id="colorPresets">
+                    <span class="color-preset" data-color="#c9d1d9" style="background:#c9d1d9"></span>
+                    <span class="color-preset" data-color="#fb7299" style="background:#fb7299"></span>
+                    <span class="color-preset" data-color="#0084ff" style="background:#0084ff"></span>
+                    <span class="color-preset" data-color="#ff0000" style="background:#ff0000"></span>
+                    <span class="color-preset" data-color="#1da1f2" style="background:#1da1f2"></span>
+                    <span class="color-preset" data-color="#f24e1e" style="background:#f24e1e"></span>
+                    <span class="color-preset" data-color="#6366f1" style="background:#6366f1"></span>
+                    <span class="color-preset" data-color="#10b981" style="background:#10b981"></span>
+                    <span class="color-preset" data-color="#f59e0b" style="background:#f59e0b"></span>
+                    <span class="color-preset" data-color="#ec4899" style="background:#ec4899"></span>
+                </div>
+            </div>
             <div class="modal-actions">
                 <button class="modal-btn cancel" id="shortcutCancelBtn">取消</button>
                 <button class="modal-btn confirm" id="shortcutConfirmBtn">添加</button>
@@ -602,31 +624,17 @@
 
     <script>
         const defaultShortcuts = [
-            { name: 'GitHub', url: 'https://github.com' },
-            { name: '哔哩哔哩', url: 'https://bilibili.com' },
-            { name: '知乎', url: 'https://zhihu.com' },
-            { name: 'YouTube', url: 'https://youtube.com' },
-            { name: 'Twitter', url: 'https://twitter.com' },
-            { name: 'Notion', url: 'https://notion.so' },
-            { name: 'Figma', url: 'https://figma.com' },
-            { name: 'Vercel', url: 'https://vercel.com' }
+            { name: 'GitHub', url: 'https://github.com', color: '#c9d1d9' },
+            { name: '哔哩哔哩', url: 'https://bilibili.com', color: '#fb7299' },
+            { name: '知乎', url: 'https://zhihu.com', color: '#0084ff' },
+            { name: 'YouTube', url: 'https://youtube.com', color: '#ff0000' },
+            { name: 'Twitter', url: 'https://twitter.com', color: '#1da1f2' },
+            { name: 'Notion', url: 'https://notion.so', color: '#ffffff' },
+            { name: 'Figma', url: 'https://figma.com', color: '#f24e1e' },
+            { name: 'Vercel', url: 'https://vercel.com', color: '#ffffff' }
         ];
 
-        // 从 URL 获取 Favicon
-        function getFaviconUrl(url) {
-            try {
-                const domain = new URL(url).hostname;
-                // DuckDuckGo Favicon API - 稳定、国内可用
-                return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
-            } catch {
-                return null;
-            }
-        }
-
         // 获取首字母作为备用
-        function getFallback(name) {
-            return (name || '?')[0].toUpperCase();
-        }
 
         // 变量
         let shortcuts = [];
@@ -781,13 +789,8 @@
                 card.draggable = true;
                 card.dataset.index = index;
                 
-                const faviconUrl = getFaviconUrl(shortcut.url);
-                const fallback = getFallback(shortcut.name);
-                
                 card.innerHTML = `
-                    <div class="shortcut-icon">
-                        ${faviconUrl ? `<img src="${faviconUrl}" alt="${shortcut.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="fallback" style="display:none">${fallback}</span>` : `<span class="fallback">${fallback}</span>`}
-                    </div>
+                    <div class="shortcut-color-bar" style="background: ${shortcut.color || '#6366f1'}"></div>
                     <span class="shortcut-name">${shortcut.name}</span>
                 `;
 
@@ -922,14 +925,33 @@
             if (index !== null) {
                 document.getElementById('siteName').value = shortcuts[index].name;
                 document.getElementById('siteUrl').value = shortcuts[index].url;
+                document.getElementById('siteColor').value = shortcuts[index].color || '#6366f1';
             } else {
                 document.getElementById('siteName').value = '';
                 document.getElementById('siteUrl').value = '';
+                document.getElementById('siteColor').value = '#6366f1';
             }
-            
+            highlightPreset(document.getElementById('siteColor').value);
             shortcutModal.classList.add('active');
             document.getElementById('siteName').focus();
         }
+
+        function highlightPreset(color) {
+            document.querySelectorAll('.color-preset').forEach(el => {
+                el.classList.toggle('selected', el.dataset.color === color);
+            });
+        }
+
+        document.getElementById('siteColor').addEventListener('input', (e) => {
+            highlightPreset(e.target.value);
+        });
+
+        document.querySelectorAll('.color-preset').forEach(el => {
+            el.addEventListener('click', () => {
+                document.getElementById('siteColor').value = el.dataset.color;
+                highlightPreset(el.dataset.color);
+            });
+        });
 
         function closeShortcutModal() {
             shortcutModal.classList.remove('active');
@@ -942,13 +964,14 @@
         document.getElementById('shortcutConfirmBtn').addEventListener('click', () => {
             const name = document.getElementById('siteName').value.trim();
             let url = document.getElementById('siteUrl').value.trim();
+            const color = document.getElementById('siteColor').value;
             if (!name || !url) return;
             if (!url.startsWith('http')) url = 'https://' + url;
 
             if (editingIndex !== null) {
-                shortcuts[editingIndex] = { name, url };
+                shortcuts[editingIndex] = { name, url, color };
             } else {
-                shortcuts.push({ name, url });
+                shortcuts.push({ name, url, color });
             }
             
             saveShortcuts();
