@@ -253,12 +253,9 @@
             display: inline-flex;
             align-items: center;
             padding: 0;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
             border-radius: 999px;
             cursor: grab;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(20px);
             text-decoration: none;
             position: relative;
             user-select: none;
@@ -267,33 +264,22 @@
 
         .shortcut-card:hover {
             transform: translateY(-2px);
-            border-color: var(--border-hover);
-            box-shadow: var(--shadow-hover);
+            filter: brightness(1.1);
         }
 
         .shortcut-card:active { cursor: grabbing; }
         .shortcut-card.dragging { opacity: 0.5; transform: scale(0.95); }
-        .shortcut-card.drag-over { border-color: var(--accent); }
-
-        .shortcut-color-bar {
-            width: 6px;
-            height: 100%;
-            min-height: 36px;
-            flex-shrink: 0;
-            border-radius: 999px 0 0 999px;
-        }
+        .shortcut-card.drag-over { filter: brightness(1.15); }
 
         .shortcut-name {
             font-size: 0.85rem;
             font-weight: 500;
-            color: var(--text-secondary);
-            padding: 10px 18px;
+            color: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
             white-space: nowrap;
             pointer-events: none;
-            transition: color 0.3s ease;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.3);
         }
-
-        .shortcut-card:hover .shortcut-name { color: var(--text-primary); }
 
         .add-card {
             display: inline-flex;
@@ -789,9 +775,9 @@
                 card.dataset.index = index;
                 
                 card.innerHTML = `
-                    <div class="shortcut-color-bar" style="background: ${shortcut.color || '#6366f1'}"></div>
                     <span class="shortcut-name">${shortcut.name}</span>
                 `;
+                card.style.background = shortcut.color || '#6366f1';
 
                 card.addEventListener('click', (e) => {
                     if (!card.classList.contains('dragging')) {
@@ -1085,7 +1071,7 @@
 
         // 搜索
         const searchEngines = { google: 'https://www.google.com/search?q=', baidu: 'https://www.baidu.com/s?wd=', bing: 'https://www.bing.com/search?q=' };
-        let currentEngine = localStorage.getItem('otter_engine') || 'google';
+        let currentEngine = localStorage.getItem('otter_engine') || '';
 
         document.querySelectorAll('.engine-btn').forEach(btn => {
             if (btn.dataset.engine === currentEngine) btn.classList.add('active');
@@ -1099,7 +1085,8 @@
 
         document.getElementById('search-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && this.value.trim()) {
-                window.open(searchEngines[currentEngine] + encodeURIComponent(this.value.trim()), '_blank');
+                const engine = currentEngine || 'google';
+                window.open(searchEngines[engine] + encodeURIComponent(this.value.trim()), '_blank');
             }
         });
 
