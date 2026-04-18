@@ -260,21 +260,51 @@
             position: relative;
             user-select: none;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow:
+                0 0 0 0.5px rgba(255,255,255,0.1) inset,
+                0 2px 16px 0 var(--card-shadow-color, rgba(99,102,241,0.2)),
+                0 4px 32px 0 rgba(0,0,0,0.15);
         }
 
         .shortcut-card::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.22) 0%, transparent 60%);
+            background: linear-gradient(
+                135deg,
+                rgba(255,255,255,0.28) 0%,
+                rgba(255,255,255,0.08) 30%,
+                transparent 60%,
+                rgba(255,255,255,0.04) 100%
+            );
             pointer-events: none;
             border-radius: inherit;
         }
 
+        .shortcut-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 8%;
+            width: 84%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            pointer-events: none;
+            border-radius: 999px;
+        }
+
         .shortcut-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 24px 0 var(--card-shadow-color, rgba(99,102,241,0.35));
+            transform: translateY(-4px) scale(1.02);
+            background: rgba(255,255,255,0.13);
+            border-color: rgba(255,255,255,0.3);
+            box-shadow:
+                0 0 0 0.5px rgba(255,255,255,0.15) inset,
+                0 8px 32px 0 var(--card-shadow-color, rgba(99,102,241,0.35)),
+                0 16px 48px 0 rgba(0,0,0,0.2);
         }
 
         .shortcut-card:active { cursor: grabbing; }
